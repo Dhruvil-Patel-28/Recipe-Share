@@ -64,6 +64,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(request=None)
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def like(self, request, pk=None):
+        recipe = self.get_object()
+        like = Like.objects.filter(user=request.user, recipe=recipe)
+        if like.exists():
+            like.delete()
+            return Response({'message': 'Recipe unliked'}, status=status.HTTP_200_OK)
+        Like.objects.create(user=request.user, recipe=recipe)
+        return Response({'message': 'Recipe liked'}, status=status.HTTP_201_CREATED)
+
 
 # This method is called automatically by DRF after the serializer has validated the data, right before saving to the database.
 

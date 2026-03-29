@@ -27,6 +27,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     ingredients = IngredientSerializer(many=True, read_only=True)
     steps = StepSerializer(many=True, read_only=True)
     author = serializers.StringRelatedField(read_only=True)
+    likes_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
@@ -34,5 +35,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             'id', 'title', 'description', 'cover_image',
             'prep_time', 'cook_time', 'difficulty', 'cuisine',
             'is_published', 'author', 'created_at',
-            'tags', 'ingredients', 'steps'
+            'tags', 'ingredients', 'steps', 'likes_count'
         ]
+    
+    def get_likes_count(self, obj):
+        return obj.likes.count()
