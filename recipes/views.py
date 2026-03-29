@@ -9,7 +9,11 @@ from django.shortcuts import render
 from rest_framework import viewsets, permissions
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import Recipe, Tag, Ingredient, Step, Like, Collection
-from .serializers import RecipeSerializer, TagSerializer
+from .serializers import RecipeSerializer, TagSerializer, IngredientSerializer, StepSerializer
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
+from drf_spectacular.utils import extend_schema
 
 #---------------------------------------------------------------------------------------------
 # ModelViewSet already has these methods written:
@@ -36,7 +40,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    @extend_schema(request=IngredientSerializer)
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def add_ingredient(self, request, pk=None):
+        recipe = self.get_object()
+        if recipe.author != request.user:
+            return Response({'error': 'You are not the author of this recipe'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = IngredientSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(recipe=recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(request=StepSerializer)
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def add_step(self, request, pk=None):
+        recipe = self.get_object()
+        if recipe.author != request.user:
+            return Response({'error': 'You are not the author of this recipe'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = StepSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(recipe=recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # This method is called automatically by DRF after the serializer has validated the data, right before saving to the database.
