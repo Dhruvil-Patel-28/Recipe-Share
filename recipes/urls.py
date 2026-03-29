@@ -4,6 +4,7 @@ from . import views
 
 router = DefaultRouter()
 router.register('recipes', views.RecipeViewSet)
+router.register('collections', views.CollectionViewSet, basename='collection')
 # this automatically creates all the CRUD routes for recipes based on the methods defined in RecipeViewSet. No need to write them manually.
 
 urlpatterns = [

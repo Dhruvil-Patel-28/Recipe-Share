@@ -9,11 +9,18 @@ from django.shortcuts import render
 from rest_framework import viewsets, permissions
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import Recipe, Tag, Ingredient, Step, Like, Collection
-from .serializers import RecipeSerializer, TagSerializer, IngredientSerializer, StepSerializer
+from .serializers import RecipeSerializer, TagSerializer, IngredientSerializer, StepSerializer, CollectionSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, inline_serializer
+from django.db.models import Q
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter
+from rest_framework import serializers
+from users.models import User
+from users.serializers import UserProfileSerializer
+
 
 #---------------------------------------------------------------------------------------------
 # ModelViewSet already has these methods written:
@@ -74,8 +81,70 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response({'message': 'Recipe unliked'}, status=status.HTTP_200_OK)
         Like.objects.create(user=request.user, recipe=recipe)
         return Response({'message': 'Recipe liked'}, status=status.HTTP_201_CREATED)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='q', description='Search by title, description or tags', required=False, type=str),
+            OpenApiParameter(name='ingredients', description='Search by ingredients, comma separated', required=False, type=str),
+        ]
+    )
+    @action(detail=False, methods=['get'])
+    def search(self, request):
+        query = request.query_params.get('q', '')
+        ingredients = request.query_params.get('ingredients', '')
+
+        recipes = Recipe.objects.filter(is_published=True)
+
+        if query:
+            recipes = recipes.filter(
+                Q(title__icontains=query) |
+                Q(description__icontains=query) |
+                Q(tags__name__icontains=query)
+            ).distinct()
+
+        if ingredients:
+            ingredient_list = [i.strip() for i in ingredients.split(',')]
+            for ingredient in ingredient_list:
+                recipes = recipes.filter(ingredients__name__icontains=ingredient)
+
+        serializer = RecipeSerializer(recipes, many=True)
+        return Response(serializer.data)
 
 
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def feed(self, request):
+        following_users = request.user.following.all()
+        recipes = Recipe.objects.filter(
+            author__in=following_users,
+            is_published=True
+        ).order_by('-created_at')
+        serializer = RecipeSerializer(recipes, many=True)
+        return Response(serializer.data)
+
+class CollectionViewSet(viewsets.ModelViewSet):
+    serializer_class = CollectionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Collection.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    @extend_schema(request=inline_serializer(
+        name='AddRecipeSerializer',
+        fields={'recipe_id': serializers.IntegerField()}
+    ))
+    @action(detail=True, methods=['post'])
+    def add_recipe(self, request, pk=None):
+        collection = self.get_object()
+        recipe_id = request.data.get('recipe_id')
+        try:
+            recipe = Recipe.objects.get(pk=recipe_id)
+            collection.recipes.add(recipe)
+            return Response({'message': 'Recipe added to collection'}, status=status.HTTP_200_OK)
+        except Recipe.DoesNotExist:
+            return Response({'error': 'Recipe not found'}, status=status.HTTP_404_NOT_FOUND)
 # This method is called automatically by DRF after the serializer has validated the data, right before saving to the database.
 
 # `serializer` — the already-validated serializer with all the recipe data.

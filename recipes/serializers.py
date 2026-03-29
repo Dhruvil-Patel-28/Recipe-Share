@@ -40,3 +40,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     
     def get_likes_count(self, obj):
         return obj.likes.count()
+
+class CollectionSerializer(serializers.ModelSerializer):
+    recipes = RecipeSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Collection
+        fields = ['id', 'name', 'is_public', 'recipes']
