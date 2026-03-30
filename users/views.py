@@ -47,3 +47,15 @@ class FollowView(APIView):
 
         user_to_follow.followers.add(request.user)
         return Response({'message': 'Followed'}, status=status.HTTP_200_OK)
+
+
+class UpdateProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(request=UserProfileSerializer)
+    def patch(self, request):
+        serializer = UserProfileSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

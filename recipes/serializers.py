@@ -4,7 +4,7 @@
 # RecipeSerializer — with nested ingredients, steps and tags
 
 from rest_framework import serializers
-from .models import Recipe, Tag, Ingredient, Step, Like, Collection
+from .models import Recipe, Tag, Ingredient, Step, Collection
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
