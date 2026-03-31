@@ -1,11 +1,12 @@
 from django.shortcuts import render
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .serializers import RegisterSerializer, UserProfileSerializer
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, inline_serializer
 from .models import User
+
 
 # Create your views here.
 
@@ -52,7 +53,13 @@ class FollowView(APIView):
 class UpdateProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @extend_schema(request=UserProfileSerializer)
+    @extend_schema(request=inline_serializer(
+        name='UpdateProfileSerializer',
+        fields={
+            'bio': serializers.CharField(required=False),
+            'profile_photo': serializers.ImageField(required=False),
+        }
+    ))
     def patch(self, request):
         serializer = UserProfileSerializer(request.user, data=request.data, partial=True)
         if serializer.is_valid():
