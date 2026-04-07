@@ -91,13 +91,13 @@ class Step(models.Model):
 # recipe — ForeignKey to Recipe
 # created_at
 
-class Like(models.Model):
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='likes')
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='likes')
-    created_at = models.DateTimeField(auto_now_add=True)
+# class Like(models.Model):
+#     user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='likes')
+#     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='likes')
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.user.username} likes {self.recipe.title}"
+#     def __str__(self):
+#         return f"{self.user.username} likes {self.recipe.title}"
 
 
 #-----------------------------------------------------------------------------------------------------

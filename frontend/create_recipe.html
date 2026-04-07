@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Recipe - RecipeShare</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">🍽️ RecipeShare</a>
+        <div class="nav-links">
+            <a href="profile.html">My Profile</a>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="card">
+            <h1>Create Recipe</h1>
+            <form id="createRecipeForm">
+                <input type="text" id="title" placeholder="Recipe Title" />
+                <textarea id="description" placeholder="Description" rows="4"></textarea>
+                <input type="number" id="prep_time" placeholder="Prep time (mins)" />
+                <input type="number" id="cook_time" placeholder="Cook time (mins)" />
+                <select id="difficulty">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+                <input type="text" id="cuisine" placeholder="Cuisine (e.g. Indian)" />
+                <input type="file" id="cover_image" accept="image/*" />
+                <label>
+                    <input type="checkbox" id="is_published" checked> Publish immediately
+                </label><br><br>
+                <button type="submit">Create Recipe</button>
+            </form>
+        </div>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/create_recipe.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile - RecipeShare</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">🍽️ RecipeShare</a>
+        <div class="nav-links">
+            <a href="create_recipe.html">+ Create Recipe</a>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </nav>
+    <div class="container">
+        <div id="profileDetail"></div>
+        <h2>My Recipes</h2>
+        <div id="myRecipes"></div>
+        <button onclick="document.getElementById('editForm').style.display='block'">Edit Profile</button>
+
+    <div id="editForm" style="display:none;" class="card">
+        <h2>Edit Profile</h2>
+        <textarea id="bio" placeholder="Your bio"></textarea>
+        <input type="file" id="profile_photo" accept="image/*" />
+        <button onclick="updateProfile()">Save</button>
+    </div>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/profile.js"></script>
+</body>
+</html>
