@@ -100,13 +100,13 @@ async function loadRecipe() {
                 </div>
                 <div class="recipe-info-item">
                     <div class="label">Author</div>
-                    <div class="value">${recipe.author}</div>
+                    <div class="value"><a href="profile.html?id=${recipe.author_id}" style="color:var(--color-text);text-decoration:none">${recipe.author}</a></div>
                 </div>
             </div>
 
             <div class="recipe-actions">
                 <button class="btn-like" id="likeBtn" onclick="likeRecipe()">
-                    ❤ ${recipe.likes_count} likes
+                    ${recipe.is_liked ? '❤️' : '♡'} ${recipe.likes_count} likes
                 </button>
             </div>
 

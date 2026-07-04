@@ -39,8 +39,15 @@ from users.serializers import UserProfileSerializer
 # Create your views here.
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = Recipe.objects.filter(is_published=True)
+    queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+
+    def get_queryset(self):
+        queryset = Recipe.objects.filter(is_published=True).order_by('-created_at')
+        author_id = self.request.query_params.get('author')
+        if author_id:
+            queryset = queryset.filter(author_id=author_id)
+        return queryset
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:

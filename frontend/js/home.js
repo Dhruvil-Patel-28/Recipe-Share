@@ -80,8 +80,8 @@ function createRecipeCard(recipe) {
                 </div>
                 <p class="recipe-card-desc">${recipe.description || ''}</p>
                 <div class="recipe-card-footer">
-                    <span class="author">by ${recipe.author}</span>
-                    <span class="likes">❤ ${recipe.likes_count}</span>
+                    <a href="profile.html?id=${recipe.author_id}" class="author">by ${recipe.author}</a>
+                    <span class="likes">${recipe.is_liked ? '❤️' : '♡'} ${recipe.likes_count}</span>
                 </div>
             </div>
         </div>

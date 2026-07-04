@@ -1,8 +1,15 @@
-requireAuth()
+const urlParams = new URLSearchParams(window.location.search)
+const profileId = urlParams.get('id')
+
+// Only require auth if viewing your own profile
+if (!profileId) {
+    requireAuth()
+}
 
 async function loadProfile() {
     try {
-        const response = await apiCall('/users/profile/')
+        const endpoint = profileId ? `/users/profile/${profileId}/` : '/users/profile/'
+        const response = await apiCall(endpoint)
         if (!response.ok) {
             showToast('Failed to load profile', 'error')
             return
@@ -10,6 +17,15 @@ async function loadProfile() {
         const user = await response.json()
 
         const avatarUrl = user.profile_photo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.username) + '&background=f3efe9&color=6b6560&size=96'
+
+        let actionButtonHtml = ''
+        if (!profileId) {
+            actionButtonHtml = `<button class="btn btn-secondary" onclick="toggleEditForm()">Edit Profile</button>`
+        } else if (getToken()) {
+            // Assume we don't know if we're following yet since the API doesn't return it directly on the profile model right now
+            // But we can just show Follow/Unfollow toggle
+            actionButtonHtml = `<button class="btn btn-primary" onclick="followUser(${user.id})">Follow / Unfollow</button>`
+        }
 
         document.getElementById('profileDetail').innerHTML = `
             <div class="profile-header">
@@ -30,11 +46,12 @@ async function loadProfile() {
                         <span class="label">Following</span>
                     </div>
                 </div>
+                <div style="margin-top:20px">${actionButtonHtml}</div>
             </div>
         `
 
-        // Pre-fill edit form
-        if (user.bio) {
+        // Pre-fill edit form if editing own profile
+        if (!profileId && user.bio) {
             document.getElementById('bio').value = user.bio
         }
     } catch (err) {
@@ -42,19 +59,31 @@ async function loadProfile() {
     }
 }
 
-async function loadMyRecipes() {
+async function followUser(userId) {
+    const response = await apiCall(`/users/follow/${userId}/`, 'POST')
+    if (response.ok) {
+        const data = await response.json()
+        showToast(data.message, 'success')
+        loadProfile()
+    } else {
+        showToast('Failed to follow user', 'error')
+    }
+}
+
+async function loadRecipes() {
     const container = document.getElementById('myRecipes')
     renderRecipeSkeletons(container, 3)
 
     try {
-        const response = await apiCall('/recipes/my_recipes/')
+        const endpoint = profileId ? `/recipes/?author=${profileId}` : '/recipes/my_recipes/'
+        const response = await apiCall(endpoint)
         const data = await response.json()
 
         const recipes = data.results || data
         container.innerHTML = ''
 
         if (recipes.length === 0) {
-            renderEmptyState(container, '📝', 'You haven\'t created any recipes yet. <a href="create_recipe.html">Create one!</a>')
+            renderEmptyState(container, '📝', profileId ? 'This user has no recipes.' : 'You haven\'t created any recipes yet. <a href="create_recipe.html">Create one!</a>')
             return
         }
 
@@ -73,7 +102,7 @@ async function loadMyRecipes() {
                             <div class="recipe-card-meta">
                                 <span>⏱ ${totalTime} min</span>
                                 <span>👨‍🍳 ${recipe.difficulty}</span>
-                                <span>❤ ${recipe.likes_count} likes</span>
+                                <span>${recipe.is_liked ? '❤️' : '♡'} ${recipe.likes_count} likes</span>
                             </div>
                         <p class="recipe-card-desc">${recipe.description || ''}</p>
                         <div class="recipe-card-footer">
@@ -86,7 +115,7 @@ async function loadMyRecipes() {
         })
     } catch (err) {
         container.innerHTML = ''
-        renderEmptyState(container, '⚠️', 'Could not load your recipes.')
+        renderEmptyState(container, '⚠️', 'Could not load recipes.')
     }
 }
 
@@ -121,4 +150,4 @@ async function updateProfile() {
 }
 
 loadProfile()
-loadMyRecipes()
+loadRecipes()
