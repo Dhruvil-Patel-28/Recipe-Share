@@ -1,6 +1,6 @@
-# 🍽️ RecipeShare
+# RecipeShare
 
-A full-stack recipe sharing platform where users can create, discover, and organize recipes. Built with **Django REST Framework** on the backend and a vanilla **HTML/CSS/JavaScript** frontend.
+A full-stack, premium recipe sharing platform where users can create, discover, and organize recipes. Built with **Django REST Framework** on the backend and a beautiful, custom **HTML/CSS/JavaScript** frontend.
 
 ---
 

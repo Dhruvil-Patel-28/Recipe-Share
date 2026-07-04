@@ -1,30 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Profile - RecipeShare</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile — RecipeShare</title>
+    <meta name="description" content="View and manage your RecipeShare profile and recipes.">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <nav>
-        <a href="index.html">🍽️ RecipeShare</a>
-        <div class="nav-links">
-            <a href="create_recipe.html">+ Create Recipe</a>
-            <button onclick="logout()">Logout</button>
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="navbar-brand">
+                 RecipeShare
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="create_recipe.html" class="btn-nav">+ New Recipe</a>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
         </div>
     </nav>
-    <div class="container">
-        <div id="profileDetail"></div>
-        <h2>My Recipes</h2>
-        <div id="myRecipes"></div>
-        <button onclick="document.getElementById('editForm').style.display='block'">Edit Profile</button>
 
-    <div id="editForm" style="display:none;" class="card">
-        <h2>Edit Profile</h2>
-        <textarea id="bio" placeholder="Your bio"></textarea>
-        <input type="file" id="profile_photo" accept="image/*" />
-        <button onclick="updateProfile()">Save</button>
+    <div class="container">
+        <div id="profileDetail">
+            <!-- Loading skeleton -->
+            <div class="profile-header">
+                <div class="skeleton" style="width:96px;height:96px;border-radius:50%;margin:0 auto 16px;"></div>
+                <div class="skeleton" style="height:28px;width:140px;margin:0 auto 10px;"></div>
+                <div class="skeleton" style="height:16px;width:200px;margin:0 auto 20px;"></div>
+            </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+            <h2 class="section-title" style="margin-bottom:0;">My Recipes</h2>
+            <button class="btn btn-secondary btn-sm" id="editToggleBtn" onclick="toggleEditForm()">Edit Profile</button>
+        </div>
+
+        <div class="edit-form" id="editForm">
+            <h2 class="section-title">Edit Profile</h2>
+            <div class="form-group">
+                <label for="bio">Bio</label>
+                <textarea id="bio" class="form-input" placeholder="Tell people about yourself..." rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Profile Photo</label>
+                <input type="file" id="profile_photo" class="form-input" accept="image/*" />
+            </div>
+            <div style="display:flex;gap:10px;">
+                <button class="btn btn-primary" onclick="updateProfile()">Save Changes</button>
+                <button class="btn btn-secondary" onclick="toggleEditForm()">Cancel</button>
+            </div>
+        </div>
+
+        <div class="recipe-grid" id="myRecipes"></div>
     </div>
-    </div>
+
     <script src="js/api.js"></script>
     <script src="js/profile.js"></script>
 </body>

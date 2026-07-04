@@ -1,39 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Create Recipe - RecipeShare</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Recipe — RecipeShare</title>
+    <meta name="description" content="Share a new recipe with the RecipeShare community.">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <nav>
-        <a href="index.html">🍽️ RecipeShare</a>
-        <div class="nav-links">
-            <a href="profile.html">My Profile</a>
-            <button onclick="logout()">Logout</button>
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="navbar-brand">
+                 RecipeShare
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="profile.html">Profile</a>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
         </div>
     </nav>
+
     <div class="container">
-        <div class="card">
-            <h1>Create Recipe</h1>
-            <form id="createRecipeForm">
-                <input type="text" id="title" placeholder="Recipe Title" />
-                <textarea id="description" placeholder="Description" rows="4"></textarea>
-                <input type="number" id="prep_time" placeholder="Prep time (mins)" />
-                <input type="number" id="cook_time" placeholder="Cook time (mins)" />
-                <select id="difficulty">
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
-                </select>
-                <input type="text" id="cuisine" placeholder="Cuisine (e.g. Indian)" />
-                <input type="file" id="cover_image" accept="image/*" />
-                <label>
-                    <input type="checkbox" id="is_published" checked> Publish immediately
-                </label><br><br>
-                <button type="submit">Create Recipe</button>
-            </form>
+        <div class="page-header">
+            <h1>Create a Recipe</h1>
+            <p>Share your culinary creation with the community</p>
         </div>
+
+        <form id="createRecipeForm">
+            <!-- Details Section -->
+            <div class="card">
+                <h2>Details</h2>
+                <div class="form-group">
+                    <label for="title">Recipe Title</label>
+                    <input type="text" id="title" class="form-input" placeholder="e.g. Classic Butter Chicken" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" class="form-input" placeholder="Tell people about this recipe..." rows="4" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="prep_time">Prep Time (minutes)</label>
+                        <input type="number" id="prep_time" class="form-input" placeholder="15" min="0" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="cook_time">Cook Time (minutes)</label>
+                        <input type="number" id="cook_time" class="form-input" placeholder="30" min="0" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Difficulty</label>
+                    <div class="difficulty-options">
+                        <div class="difficulty-option">
+                            <input type="radio" name="difficulty" id="diff-easy" value="easy" checked />
+                            <label for="diff-easy">Easy</label>
+                        </div>
+                        <div class="difficulty-option">
+                            <input type="radio" name="difficulty" id="diff-medium" value="medium" />
+                            <label for="diff-medium">Medium</label>
+                        </div>
+                        <div class="difficulty-option">
+                            <input type="radio" name="difficulty" id="diff-hard" value="hard" />
+                            <label for="diff-hard">Hard</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cuisine">Cuisine</label>
+                    <input type="text" id="cuisine" class="form-input" placeholder="e.g. Indian, Italian, Thai" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Cover Image</label>
+                    <div class="image-upload-area" id="uploadArea">
+                        <input type="file" id="cover_image" accept="image/*" onchange="previewImage(this)" />
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">Click to upload a cover photo</div>
+                    </div>
+                    <div class="image-preview" id="imagePreview">
+                        <img id="previewImg" src="" alt="Preview" />
+                    </div>
+                </div>
+
+                <label class="form-checkbox">
+                    <input type="checkbox" id="is_published" checked />
+                    Publish immediately
+                </label>
+            </div>
+
+            <!-- Ingredients Section -->
+            <div class="card">
+                <h2>Ingredients</h2>
+                <div id="ingredientsList"></div>
+                <button type="button" class="btn-add-row" onclick="addIngredientRow()">+ Add Ingredient</button>
+            </div>
+
+            <!-- Steps Section -->
+            <div class="card">
+                <h2>Steps</h2>
+                <div id="stepsList"></div>
+                <button type="button" class="btn-add-row" onclick="addStepRow()">+ Add Step</button>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full" id="submitBtn">Create Recipe</button>
+        </form>
     </div>
+
     <script src="js/api.js"></script>
     <script src="js/create_recipe.js"></script>
 </body>

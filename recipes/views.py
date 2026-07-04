@@ -4,6 +4,9 @@
 # PUT /api/recipes/1/ — update a recipe
 # DELETE /api/recipes/1/ — delete a recipe
 # GET /api/recipes/search/ — search by ingredients or title
+# DELETE /api/recipes/1/delete_ingredient/ — delete an ingredient (author only)
+# DELETE /api/recipes/1/delete_step/ — delete a step (author only)
+# GET /api/recipes/my_recipes/ — get current user's recipes
 
 from django.shortcuts import render
 from rest_framework import viewsets, permissions
@@ -78,9 +81,43 @@ class RecipeViewSet(viewsets.ModelViewSet):
         like = Like.objects.filter(user=request.user, recipe=recipe)
         if like.exists():
             like.delete()
-            return Response({'message': 'Recipe unliked'}, status=status.HTTP_200_OK)
+            return Response({'message': 'Recipe unliked', 'liked': False}, status=status.HTTP_200_OK)
         Like.objects.create(user=request.user, recipe=recipe)
-        return Response({'message': 'Recipe liked'}, status=status.HTTP_201_CREATED)
+        return Response({'message': 'Recipe liked', 'liked': True}, status=status.HTTP_201_CREATED)
+
+    @extend_schema(request=inline_serializer(
+        name='DeleteIngredientSerializer',
+        fields={'ingredient_id': serializers.IntegerField()}
+    ))
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def delete_ingredient(self, request, pk=None):
+        recipe = self.get_object()
+        if recipe.author != request.user:
+            return Response({'error': 'You are not the author of this recipe'}, status=status.HTTP_403_FORBIDDEN)
+        ingredient_id = request.data.get('ingredient_id')
+        try:
+            ingredient = Ingredient.objects.get(pk=ingredient_id, recipe=recipe)
+            ingredient.delete()
+            return Response({'message': 'Ingredient deleted'}, status=status.HTTP_200_OK)
+        except Ingredient.DoesNotExist:
+            return Response({'error': 'Ingredient not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    @extend_schema(request=inline_serializer(
+        name='DeleteStepSerializer',
+        fields={'step_id': serializers.IntegerField()}
+    ))
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def delete_step(self, request, pk=None):
+        recipe = self.get_object()
+        if recipe.author != request.user:
+            return Response({'error': 'You are not the author of this recipe'}, status=status.HTTP_403_FORBIDDEN)
+        step_id = request.data.get('step_id')
+        try:
+            step = Step.objects.get(pk=step_id, recipe=recipe)
+            step.delete()
+            return Response({'message': 'Step deleted'}, status=status.HTTP_200_OK)
+        except Step.DoesNotExist:
+            return Response({'error': 'Step not found'}, status=status.HTTP_404_NOT_FOUND)
     
     @extend_schema(
         parameters=[
@@ -107,6 +144,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             for ingredient in ingredient_list:
                 recipes = recipes.filter(ingredients__name__icontains=ingredient)
 
+        page = self.paginate_queryset(recipes)
+        if page is not None:
+            serializer = RecipeSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
         serializer = RecipeSerializer(recipes, many=True)
         return Response(serializer.data)
 
@@ -118,6 +160,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
             author__in=following_users,
             is_published=True
         ).order_by('-created_at')
+
+        page = self.paginate_queryset(recipes)
+        if page is not None:
+            serializer = RecipeSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = RecipeSerializer(recipes, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_recipes(self, request):
+        recipes = Recipe.objects.filter(author=request.user).order_by('-created_at')
+
+        page = self.paginate_queryset(recipes)
+        if page is not None:
+            serializer = RecipeSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
         serializer = RecipeSerializer(recipes, many=True)
         return Response(serializer.data)
 

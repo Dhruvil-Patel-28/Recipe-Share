@@ -1,20 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Recipe - RecipeShare</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe — RecipeShare</title>
+    <meta name="description" content="View recipe details, ingredients, and cooking steps.">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <nav>
-        <a href="index.html">🍽️ RecipeShare</a>
-        <div class="nav-links">
-            <a href="profile.html">My Profile</a>
-            <button onclick="logout()">Logout</button>
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="navbar-brand">
+                 RecipeShare
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="profile.html">Profile</a>
+                <a href="create_recipe.html" class="btn-nav">+ New Recipe</a>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
         </div>
     </nav>
+
     <div class="container">
-        <div id="recipeDetail">Loading... </div>
+        <div id="recipeDetail">
+            <!-- Loading skeleton -->
+            <div class="skeleton" style="height:380px;border-radius:16px;margin-bottom:28px;"></div>
+            <div class="skeleton" style="height:36px;width:60%;margin-bottom:14px;"></div>
+            <div class="skeleton" style="height:18px;width:80%;margin-bottom:28px;"></div>
+        </div>
     </div>
+
     <script src="js/api.js"></script>
     <script src="js/recipe.js"></script>
 </body>

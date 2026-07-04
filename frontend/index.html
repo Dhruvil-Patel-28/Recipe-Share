@@ -1,21 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>RecipeShare</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RecipeShare — Discover & Share Recipes</title>
+    <meta name="description" content="Discover, create, and share your favorite recipes with a community of food lovers.">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <nav>
-        <a href="index.html">🍽️ RecipeShare</a>
-        <div class="nav-links">
-            <a href="create_recipe.html">+ Create Recipe</a>
-            <a href="profile.html">My Profile</a>
-            <button onclick="logout()">Logout</button>
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="navbar-brand">
+                 RecipeShare
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="profile.html">Profile</a>
+                <a href="create_recipe.html" class="btn-nav">+ New Recipe</a>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
         </div>
     </nav>
+
     <div class="container">
-        <div id="recipeList"></div>
+        <div class="page-header">
+            <h1>Recipes</h1>
+            <p>Discover something delicious to cook today</p>
+        </div>
+
+        <div class="search-section">
+            <form class="search-bar" id="searchForm" onsubmit="handleSearch(event)">
+                <input type="text" id="searchInput" placeholder="Search by title, cuisine, or ingredient..." />
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        <div class="recipe-grid" id="recipeList"></div>
+
+        <div class="pagination" id="pagination" style="display:none;">
+            <button id="prevBtn" onclick="changePage(-1)">← Previous</button>
+            <span class="page-info" id="pageInfo"></span>
+            <button id="nextBtn" onclick="changePage(1)">Next →</button>
+        </div>
     </div>
+
     <script src="js/api.js"></script>
     <script src="js/home.js"></script>
 </body>
